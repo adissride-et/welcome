@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Adiss Ride — Coming Soon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,600&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+/* ── RESET ─────────────────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --black:   #070604;
+  --deep:    #0e0c08;
+  --surface: #161410;
+  --border:  #2a2620;
+  --orange:  #e8560c;
+  --amber:   #e8a020;
+  --gold:    #c8880a;
+  --text:    #f0ead8;
+  --muted:   #6e6456;
+  --dim:     #3a3428;
+
+  --display: 'Cormorant Garamond', Georgia, serif;
+  --body:    'Barlow', sans-serif;
+  --cond:    'Barlow Condensed', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CURSOR ─────────────────────────────────────────────────── */
+#cur {
+  position: fixed;
+  width: 10px; height: 10px;
+  background: var(--orange);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: width .2s, height .2s, background .2s, opacity .2s;
+  box-shadow: 0 0 12px rgba(232,86,12,.6);
+}
+#cur.big {
+  width: 36px; height: 36px;
+  background: transparent;
+  border: 1.5px solid var(--amber);
+  box-shadow: 0 0 20px rgba(232,160,32,.3);
+}
+
+/* ── CANVAS BG ──────────────────────────────────────────────── */
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  opacity: .7;
+}
+
+/* ── GRAIN ──────────────────────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  opacity: .03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── LAYOUT ─────────────────────────────────────────────────── */
+.wrap {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 0 clamp(24px, 6vw, 100px);
+}
+
+/* ── TOP BAR ────────────────────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 36px 0 0;
+  animation: fadeDown .8s ease both;
+}
+
+.logo {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none;
+}
+.logo-mark {
+  width: 38px; height: 38px;
+  background: var(--orange);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(232,86,12,.4);
+}
+.logo-mark svg { display:block; }
+.logo-name {
+  font-family: var(--display);
+  font-size: 22px; font-weight: 600;
+  color: var(--text);
+  letter-spacing: .02em;
+}
+
+.top-tag {
+  font-family: var(--cond);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 7px 14px;
+  border-radius: 100px;
+}
+
+/* ── HERO CENTER ────────────────────────────────────────────── */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 0 40px;
+  gap: 0;
+}
+
+/* Big background word */
+.bg-word {
+  font-family: var(--display);
+  font-size: clamp(100px, 22vw, 280px);
+  font-weight: 700;
+  font-style: italic;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--border);
+  line-height: .85;
+  letter-spacing: -.03em;
+  user-select: none;
+  margin-bottom: -clamp(60px, 12vw, 160px);
+  animation: fadeIn 1.2s ease both;
+  opacity: .5;
+}
+
+/* COMING badge */
+.coming-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(232,86,12,.1);
+  border: 1px solid rgba(232,86,12,.3);
+  border-radius: 100px;
+  padding: 7px 18px;
+  font-family: var(--cond);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 28px;
+  animation: fadeUp .8s .2s ease both;
+  opacity: 0;
+}
+.badge-dot {
+  width: 6px; height: 6px;
+  background: var(--orange);
+  border-radius: 50%;
+  animation: blink 1.6s ease-in-out infinite;
+}
+
+.headline {
+  font-family: var(--display);
+  font-size: clamp(48px, 8vw, 110px);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--text);
+  animation: fadeUp .8s .3s ease both;
+  opacity: 0;
+  position: relative;
+  z-index: 2;
+}
+.headline em {
+  font-style: italic;
+  color: var(--orange);
+}
+.headline .line2 {
+  display: block;
+  color: var(--text);
+  opacity: .35;
+}
+
+.sub {
+  font-size: clamp(14px, 1.6vw, 17px);
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 480px;
+  margin-top: 28px;
+  animation: fadeUp .8s .4s ease both;
+  opacity: 0;
+  position: relative; z-index: 2;
+}
+
+/* ── COUNTDOWN ──────────────────────────────────────────────── */
+.countdown-wrap {
+  display: flex; gap: clamp(20px, 4vw, 56px);
+  margin-top: 56px;
+  animation: fadeUp .8s .5s ease both;
+  opacity: 0;
+  position: relative; z-index: 2;
+}
+
+.countdown-item {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  position: relative;
+}
+.countdown-item:not(:last-child)::after {
+  content: ':';
+  position: absolute;
+  right: clamp(-14px, -2.5vw, -32px);
+  top: 8px;
+  font-family: var(--display);
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 300;
+  color: var(--dim);
+  line-height: 1;
+}
+
+.count-num {
+  font-family: var(--display);
+  font-size: clamp(44px, 7vw, 88px);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+  min-width: clamp(56px, 9vw, 110px);
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: clamp(10px, 2vw, 20px) clamp(12px, 2.5vw, 28px);
+  position: relative;
+  overflow: hidden;
+  transition: color .15s;
+}
+.count-num::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(232,86,12,.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+.count-num.flip { color: var(--orange); }
+
+.count-label {
+  font-family: var(--cond);
+  font-size: 10px; font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── DIVIDER ────────────────────────────────────────────────── */
+.divider {
+  display: flex; align-items: center; gap: 20px;
+  margin-top: 56px; width: 100%; max-width: 520px;
+  animation: fadeUp .8s .6s ease both;
+  opacity: 0;
+  position: relative; z-index: 2;
+}
+.divider-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+.divider-text {
+  font-family: var(--cond);
+  font-size: 10px; font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ── EMAIL FORM ─────────────────────────────────────────────── */
+.email-form {
+  display: flex; gap: 0;
+  width: 100%; max-width: 480px;
+  margin-top: 28px;
+  animation: fadeUp .8s .7s ease both;
+  opacity: 0;
+  position: relative; z-index: 2;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+  transition: border-color .2s, box-shadow .2s;
+}
+.email-form:focus-within {
+  border-color: rgba(232,86,12,.5);
+  box-shadow: 0 0 0 3px rgba(232,86,12,.08);
+}
+
+.email-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 16px 20px;
+  font-family: var(--body);
+  font-size: 14px; font-weight: 400;
+  color: var(--text);
+  caret-color: var(--orange);
+}
+.email-input::placeholder { color: var(--muted); }
+
+.email-btn {
+  background: var(--orange);
+  border: none;
+  padding: 14px 26px;
+  font-family: var(--cond);
+  font-size: 12px; font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: white;
+  cursor: none;
+  transition: background .15s, transform .1s;
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 8px;
+}
+.email-btn:hover { background: #c04008; }
+.email-btn:active { transform: scale(.97); }
+
+.form-note {
+  font-size: 11px; color: var(--muted);
+  margin-top: 10px;
+  animation: fadeUp .8s .8s ease both;
+  opacity: 0;
+  position: relative; z-index: 2;
+}
+
+/* Success state */
+.success-msg {
+  display: none;
+  align-items: center; gap: 10px;
+  background: rgba(22,163,74,.1);
+  border: 1px solid rgba(22,163,74,.3);
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 13px; color: #4ade80;
+  width: 100%; max-width: 480px;
+  animation: fadeUp .4s ease both;
+  position: relative; z-index: 2;
+}
+.success-msg.show { display: flex; }
+
+/* ── ROUTES STRIP ────────────────────────────────────────────── */
+.routes-strip {
+  display: flex; align-items: center;
+  gap: clamp(16px, 3vw, 40px);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 52px;
+  animation: fadeUp .8s .9s ease both;
+  opacity: 0;
+  position: relative; z-index: 2;
+}
+
+.route-pill {
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 9px 18px;
+  font-family: var(--cond);
+  font-size: 12px; font-weight: 500;
+  letter-spacing: .06em;
+  color: var(--muted);
+  transition: border-color .2s, color .2s;
+  white-space: nowrap;
+}
+.route-pill:hover { border-color: var(--orange); color: var(--text); }
+.route-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--orange);
+  opacity: .7;
+}
+.route-arrow { opacity: .4; font-size: 10px; }
+
+/* ── BOTTOM BAR ──────────────────────────────────────────────── */
+.bottombar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 36px;
+  animation: fadeUp .8s 1s ease both;
+  opacity: 0;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.bottom-left {
+  font-size: 12px; color: var(--muted);
+  font-family: var(--cond);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.social-links { display: flex; gap: 10px; }
+.social-link {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  transition: border-color .2s, color .2s, background .2s;
+  cursor: none;
+}
+.social-link:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: rgba(232,86,12,.08);
+}
+
+/* ── ROAD ANIMATION (side decor) ─────────────────────────────── */
+.road-left, .road-right {
+  position: fixed;
+  top: 0; bottom: 0;
+  width: 3px;
+  z-index: 5;
+  pointer-events: none;
+}
+.road-left { left: clamp(10px, 2.5vw, 40px); }
+.road-right { right: clamp(10px, 2.5vw, 40px); }
+
+.road-line {
+  width: 100%; height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--border) 0px,
+    var(--border) 20px,
+    transparent 20px,
+    transparent 40px
+  );
+  animation: roadScroll 1.2s linear infinite;
+}
+.road-right .road-line { animation-direction: reverse; }
+
+/* ── PARTICLES ───────────────────────────────────────────────── */
+.particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+  background: var(--orange);
+  animation: particleFade linear forwards;
+  opacity: 0;
+}
+
+/* ── KEYFRAMES ───────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:none; }
+}
+@keyframes fadeDown {
+  from { opacity:0; transform:translateY(-16px); }
+  to   { opacity:1; transform:none; }
+}
+@keyframes fadeIn {
+  from { opacity:0; }
+  to   { opacity:.5; }
+}
+@keyframes blink {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.4; transform:scale(.7); }
+}
+@keyframes roadScroll {
+  from { background-position: 0 0; }
+  to   { background-position: 0 40px; }
+}
+@keyframes particleFade {
+  0%   { opacity:.8; transform:translateY(0) scale(1); }
+  100% { opacity:0;  transform:translateY(-80px) scale(0); }
+}
+@keyframes scanline {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(100%); }
+}
+
+/* ── SCAN EFFECT ON CARDS ────────────────────────────────────── */
+.count-num::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 40%, rgba(232,86,12,.06) 50%, transparent 60%);
+  transform: translateY(-100%);
+  animation: scanline 3s ease-in-out infinite;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .top-tag { display:none; }
+  .countdown-wrap { gap: 14px; }
+  .routes-strip { gap: 10px; }
+  .route-pill { font-size: 11px; padding: 7px 14px; }
+  .bottombar { justify-content: center; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div id="cur"></div>
+
+<!-- Animated background canvas -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Road side decorations -->
+<div class="road-left"><div class="road-line"></div></div>
+<div class="road-right"><div class="road-line"></div></div>
+
+<div class="wrap">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <a href="#" class="logo">
+      <div class="logo-mark">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2L4 6.5v7L10 18l6-4.5v-7L10 2z" fill="white" opacity=".9"/>
+          <circle cx="10" cy="10" r="2.8" fill="white"/>
+        </svg>
+      </div>
+      <span class="logo-name">Adiss Ride</span>
+    </a>
+    <div class="top-tag">Ethiopia · 2026</div>
+  </header>
+
+  <!-- HERO -->
+  <main class="hero">
+    <div class="bg-word">Soon</div>
+
+    <div class="coming-badge">
+      <span class="badge-dot"></span>
+      Coming Soon
+    </div>
+
+    <h1 class="headline">
+      <em>Intercity travel,</em>
+      <span class="line2">reimagined.</span>
+    </h1>
+
+    <p class="sub">
+      We're putting the finishing touches on something built for Ethiopia. Verified drivers, secure payments, GPS-tracked routes between your cities.
+    </p>
+
+    <!-- COUNTDOWN -->
+    <div class="countdown-wrap">
+      <div class="countdown-item">
+        <div class="count-num" id="cd-days">00</div>
+        <div class="count-label">Days</div>
+      </div>
+      <div class="countdown-item">
+        <div class="count-num" id="cd-hours">00</div>
+        <div class="count-label">Hours</div>
+      </div>
+      <div class="countdown-item">
+        <div class="count-num" id="cd-mins">00</div>
+        <div class="count-label">Minutes</div>
+      </div>
+      <div class="countdown-item">
+        <div class="count-num" id="cd-secs">00</div>
+        <div class="count-label">Seconds</div>
+      </div>
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-text">Get early access</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- EMAIL FORM -->
+    <form class="email-form" id="notifyForm">
+      <input
+        class="email-input"
+        type="email"
+        id="emailInput"
+        placeholder="Your phone or email address"
+        required
+        autocomplete="email"
+      />
+      <button type="submit" class="email-btn">
+        Notify Me
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </form>
+
+    <div class="success-msg" id="successMsg">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="7" stroke="#4ade80" stroke-width="1.5"/>
+        <path d="M5 8l2 2 4-4" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      You're on the list! We'll notify you at launch.
+    </div>
+
+    <p class="form-note">No spam. Just one message when we launch. 🇪🇹</p>
+
+    <!-- ROUTES -->
+    <div class="routes-strip">
+      <div class="route-pill">
+        <div class="route-dot"></div>
+        Hawassa
+        <span class="route-arrow">→</span>
+        Addis Ababa
+      </div>
+      <div class="route-pill">
+        <div class="route-dot"></div>
+        Addis Ababa
+        <span class="route-arrow">→</span>
+        Hawassa
+      </div>
+      <div class="route-pill">
+        <div class="route-dot"></div>
+        Hawassa
+        <span class="route-arrow">→</span>
+        Adola
+      </div>
+      <div class="route-pill" style="border-style:dashed;opacity:.5">
+        + More routes
+      </div>
+    </div>
+  </main>
+
+  <!-- BOTTOM BAR -->
+  <footer class="bottombar">
+    <div class="bottom-left">© 2026 Adiss Ride · Built in Ethiopia 🇪🇹</div>
+    <div class="social-links">
+      <a href="#" class="social-link" title="Telegram">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.94 8.19l-2.02 9.52c-.15.68-.54.84-1.08.52l-3-2.21-1.45 1.39c-.16.16-.3.3-.61.3l.22-3.07 5.58-5.04c.24-.22-.05-.34-.38-.12L7.09 14.5l-2.96-.92c-.64-.2-.66-.64.14-.95l11.55-4.45c.54-.19 1.01.13.12.01z"/>
+        </svg>
+      </a>
+      <a href="#" class="social-link" title="Instagram">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+      </a>
+      <a href="#" class="social-link" title="Twitter / X">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+      </a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+// ── CURSOR ──────────────────────────────────────────────────────
+const cur = document.getElementById('cur')
+let mx = -100, my = -100
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY
+  cur.style.left = mx + 'px'
+  cur.style.top  = my + 'px'
+})
+document.querySelectorAll('a, button, .route-pill, .count-num').forEach(el => {
+  el.addEventListener('mouseenter', () => cur.classList.add('big'))
+  el.addEventListener('mouseleave', () => cur.classList.remove('big'))
+})
+
+// ── BACKGROUND CANVAS ───────────────────────────────────────────
+const canvas = document.getElementById('bgCanvas')
+const ctx = canvas.getContext('2d')
+let W, H
+
+function resize() {
+  W = canvas.width  = window.innerWidth
+  H = canvas.height = window.innerHeight
+}
+resize()
+window.addEventListener('resize', resize)
+
+// Particles / stars
+const stars = Array.from({ length: 120 }, () => ({
+  x: Math.random() * 2 - 1,
+  y: Math.random() * 2 - 1,
+  r: Math.random() * 1.2 + .2,
+  a: Math.random() * Math.PI * 2,
+  speed: Math.random() * .0003 + .0001,
+  opacity: Math.random() * .5 + .1,
+}))
+
+// Road lines
+const roads = Array.from({ length: 5 }, (_, i) => ({
+  x: (i + 1) / 6,
+  offset: Math.random() * 40,
+  speed: Math.random() * .4 + .2,
+}))
+let roadOffset = 0
+
+// Horizon glow
+function drawGlow() {
+  const cx = W / 2, cy = H * .52
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, W * .55)
+  g.addColorStop(0, 'rgba(232,86,12,.06)')
+  g.addColorStop(.5, 'rgba(200,136,10,.02)')
+  g.addColorStop(1, 'transparent')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, W, H)
+}
+
+// Horizon line
+function drawHorizon() {
+  const y = H * .52
+  const g = ctx.createLinearGradient(0, y, W, y)
+  g.addColorStop(0, 'transparent')
+  g.addColorStop(.3, 'rgba(232,86,12,.12)')
+  g.addColorStop(.5, 'rgba(232,160,32,.18)')
+  g.addColorStop(.7, 'rgba(232,86,12,.12)')
+  g.addColorStop(1, 'transparent')
+  ctx.strokeStyle = g
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(0, y)
+  ctx.lineTo(W, y)
+  ctx.stroke()
+}
+
+// Perspective road
+function drawRoad(t) {
+  const vx = W / 2, vy = H * .52
+  const roadW = W * .18
+
+  // Road surface
+  ctx.beginPath()
+  ctx.moveTo(vx - 2, vy)
+  ctx.lineTo(vx - roadW, H + 20)
+  ctx.lineTo(vx + roadW, H + 20)
+  ctx.lineTo(vx + 2, vy)
+  ctx.closePath()
+  const rg = ctx.createLinearGradient(0, vy, 0, H)
+  rg.addColorStop(0, 'rgba(20,16,10,0)')
+  rg.addColorStop(.3, 'rgba(20,16,10,.4)')
+  rg.addColorStop(1, 'rgba(14,12,8,.9)')
+  ctx.fillStyle = rg
+  ctx.fill()
+
+  // Center dashes
+  const dashCount = 14
+  for (let i = 0; i < dashCount; i++) {
+    const progress = (i / dashCount + (t * .0004) % 1)
+    const py = vy + (H - vy) * progress
+    const pw = 2 + progress * 6
+    const ph = (H - vy) / dashCount * .35
+    const pa = .6 * (1 - progress * .5)
+    ctx.fillStyle = `rgba(232,160,32,${pa})`
+    ctx.fillRect(vx - pw / 2, py, pw, ph * progress * 2)
+  }
+
+  // Side lines
+  ;[-.85, .85].forEach(side => {
+    ctx.beginPath()
+    ctx.moveTo(vx + side * 2, vy)
+    ctx.lineTo(vx + side * roadW * .92, H + 20)
+    const lg = ctx.createLinearGradient(0, vy, 0, H)
+    lg.addColorStop(0, 'transparent')
+    lg.addColorStop(.4, `rgba(232,86,12,.25)`)
+    lg.addColorStop(1, `rgba(232,86,12,.08)`)
+    ctx.strokeStyle = lg
+    ctx.lineWidth = 1
+    ctx.stroke()
+  })
+}
+
+// Stars
+function drawStars() {
+  const cx = W / 2, cy = H * .52
+  stars.forEach(s => {
+    s.a += s.speed
+    const x = cx + Math.cos(s.a) * s.x * W * .5
+    const y = cy - Math.abs(Math.sin(s.a * .3)) * cy * .9 + s.y * cy * .4
+    if (y > cy) return
+    ctx.beginPath()
+    ctx.arc(x, y, s.r, 0, Math.PI * 2)
+    ctx.fillStyle = `rgba(240,234,216,${s.opacity * (.5 + .5 * Math.sin(s.a * 3))})`
+    ctx.fill()
+  })
+}
+
+let raf
+function render(t) {
+  ctx.clearRect(0, 0, W, H)
+  drawGlow()
+  drawStars()
+  drawHorizon()
+  drawRoad(t)
+  raf = requestAnimationFrame(render)
+}
+requestAnimationFrame(render)
+
+// ── COUNTDOWN ───────────────────────────────────────────────────
+// Set launch date — 60 days from now
+const launch = new Date()
+launch.setDate(launch.getDate() + 7)
+launch.setHours(9, 0, 0, 0)
+
+const dEl = document.getElementById('cd-days')
+const hEl = document.getElementById('cd-hours')
+const mEl = document.getElementById('cd-mins')
+const sEl = document.getElementById('cd-secs')
+
+function pad(n) { return String(n).padStart(2, '0') }
+
+function flash(el) {
+  el.classList.add('flip')
+  setTimeout(() => el.classList.remove('flip'), 300)
+}
+
+let prev = {}
+function tick() {
+  const now  = new Date()
+  const diff = Math.max(0, launch - now)
+
+  const d = Math.floor(diff / 86400000)
+  const h = Math.floor((diff % 86400000) / 3600000)
+  const m = Math.floor((diff % 3600000)  / 60000)
+  const s = Math.floor((diff % 60000)    / 1000)
+
+  if (d !== prev.d) { dEl.textContent = pad(d); flash(dEl) }
+  if (h !== prev.h) { hEl.textContent = pad(h); flash(hEl) }
+  if (m !== prev.m) { mEl.textContent = pad(m); flash(mEl) }
+  if (s !== prev.s) { sEl.textContent = pad(s); flash(sEl) }
+
+  prev = { d, h, m, s }
+}
+tick()
+setInterval(tick, 1000)
+
+// ── FORM ────────────────────────────────────────────────────────
+const form       = document.getElementById('notifyForm')
+const emailInput = document.getElementById('emailInput')
+const successMsg = document.getElementById('successMsg')
+
+form.addEventListener('submit', e => {
+  e.preventDefault()
+  const val = emailInput.value.trim()
+  if (!val) return
+
+  // Hide form, show success
+  form.style.display = 'none'
+  successMsg.classList.add('show')
+
+  // Spawn particles
+  spawnParticles()
+
+  // Store in localStorage
+  const list = JSON.parse(localStorage.getItem('ar_waitlist') || '[]')
+  list.push({ contact: val, date: new Date().toISOString() })
+  localStorage.setItem('ar_waitlist', JSON.stringify(list))
+})
+
+// ── PARTICLES ───────────────────────────────────────────────────
+function spawnParticles() {
+  const btn = document.querySelector('.email-btn')
+  if (!btn) return
+  const rect = btn.getBoundingClientRect()
+  const cx = rect.left + rect.width / 2
+  const cy = rect.top  + rect.height / 2
+
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div')
+    p.className = 'particle'
+    const size = Math.random() * 6 + 3
+    const angle = Math.random() * Math.PI * 2
+    const dist  = Math.random() * 80 + 30
+    const dur   = Math.random() * 600 + 500
+
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${cx + Math.cos(angle)*dist}px;
+      top:${cy  + Math.sin(angle)*dist}px;
+      animation-duration:${dur}ms;
+      background:${Math.random() > .5 ? 'var(--orange)' : 'var(--amber)'};
+      opacity:0;
+    `
+    document.body.appendChild(p)
+    requestAnimationFrame(() => { p.style.opacity = '.8' })
+    setTimeout(() => p.remove(), dur + 100)
+  }
+}
+
+// ── HOVER PARALLAX ON HEADLINE ───────────────────────────────────
+const headline = document.querySelector('.headline')
+document.addEventListener('mousemove', e => {
+  if (!headline) return
+  const rx = (e.clientX / window.innerWidth  - .5) * 10
+  const ry = (e.clientY / window.innerHeight - .5) * -6
+  headline.style.transform = `rotateY(${rx}deg) rotateX(${ry}deg)`
+  headline.style.transition = 'transform .1s'
+})
+</script>
+</body>
+</html>

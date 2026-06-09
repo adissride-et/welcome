@@ -12,6 +12,7 @@
 /* ─── RESET & BASE ──────────────────────────────────────────── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+
 :root {
   --ink:     #0d0b08;
   --paper:   #faf6ef;
@@ -90,11 +91,10 @@ nav.scrolled {
   text-decoration: none;
   display: flex; align-items: center; gap: 10px;
 }
-.nav-logo-mark {
-  width: 32px; height: 32px;
-  background: var(--orange);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
+
+.nav-logo-mark,
+.nav-logo-mark img {
+      width: 32px;  height: 32px;
 }
 .nav-links {
   display: flex; gap: 36px; list-style: none;
@@ -872,11 +872,11 @@ section { position: relative; }
 .dl-btn-android:hover { box-shadow: 0 16px 48px rgba(232,84,10,0.5); }
 
 .dl-btn-ios {
-  background: rgba(255,255,255,0.06);
+  background: rgb(0, 0, 0);
   color: var(--paper);
   border: 1.5px solid rgba(255,255,255,0.12);
 }
-.dl-btn-ios:hover { background: rgba(255,255,255,0.1); }
+.dl-btn-ios:hover { background: rgb(48, 46, 46); }
 
 .dl-btn-icon { font-size: 28px; }
 .dl-btn-text-small { font-size: 10px; opacity: 0.7; letter-spacing: 0.06em; text-transform: uppercase; }
@@ -1048,10 +1048,7 @@ footer {
 <nav id="navbar">
   <a href="#" class="nav-logo">
     <div class="nav-logo-mark">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <path d="M9 2L3 6v6l6 4 6-4V6L9 2z" fill="white" opacity="0.9"/>
-        <circle cx="9" cy="9" r="2.5" fill="white"/>
-      </svg>
+      <img src="logo.png" alt="">
     </div>
     Adiss Ride
   </a>
@@ -1067,27 +1064,32 @@ footer {
 <!-- ─── HERO ─────────────────────────────────────────────────── -->
 <section id="hero">
   <div class="hero-left">
-    <div class="hero-badge">
-      <span class="hero-badge-dot"></span>
-      Now Live in Ethiopia
-    </div>
 
     <h1 class="hero-headline">
       Travel between<br/>cities with<br/><em>total peace</em><br/>of mind.
     </h1>
 
     <p class="hero-sub">
-      Adiss Ride connects passengers with trusted intercity drivers across Ethiopia — with real-time GPS tracking, secure escrow payments, and verified seats.
+      Adiss Ride connects passengers with trusted intercity drivers across Ethiopia secure escrow payments, and verified seats.
     </p>
 
     <div class="hero-actions">
-      <a href="#download" class="btn-primary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 16l-5-5h3V4h4v7h3l-5 5z"/><path d="M4 20h16"/></svg>
-        Download Free App
+      <div class="download-buttons reveal reveal-delay-3">
+      <a href="https://github.com/adissride-et/AdissRide/releases/download/Android/application-69ba26df-f629-4a7c-a9aa-ad0eb91ae513.apk" class="dl-btn dl-btn-android">
+        <div class="dl-btn-icon">🤖</div>
+        <div>
+          <div class="dl-btn-text-small">Download on</div>
+          <div class="dl-btn-text-big">Google Play</div>
+        </div>
       </a>
-      <a href="#how" class="btn-secondary">
-        See how it works →
+      <a href="#" class="dl-btn dl-btn-ios" onclick="event.preventDefault(); showComingSoon()">
+        <div class="dl-btn-icon">🍎</div>
+        <div>
+          <div class="dl-btn-text-small">Download on the</div>
+          <div class="dl-btn-text-big">App Store</div>
+        </div>
       </a>
+    </div>
     </div>
 
     <div class="hero-stats">
@@ -1491,15 +1493,14 @@ footer {
     </p>
 
     <div class="download-buttons reveal reveal-delay-3">
-      <a href="https://wf-artifacts.eascdn.net/builds/internal-st/5ad88074-85c8-479d-bc04-bf39904e38b9/69ba26df-f629-4a7c-a9aa-ad0eb91ae513/019ea264-a21b-72eb-9580-e2dd2e7449c0/application-69ba26df-f629-4a7c-a9aa-ad0eb91ae513.apk?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=75d871a1a44e598975dd84fa2341c9b0%2F20260609%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260609T051712Z&X-Amz-Expires=900&X-Amz-Signature=cc2b9a700de91d8cf5ea132843d3c87e7f7ab8129adad6e67f41304b0a98fcde&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject" class="dl-btn dl-btn-android">
+      <a href="https://github.com/adissride-et/AdissRide/releases/download/Android/application-69ba26df-f629-4a7c-a9aa-ad0eb91ae513.apk" class="dl-btn dl-btn-android">
         <div class="dl-btn-icon">🤖</div>
         <div>
           <div class="dl-btn-text-small">Download on</div>
           <div class="dl-btn-text-big">Google Play</div>
         </div>
       </a>
-            <a href="#" class="dl-btn dl-btn-ios" onclick="event.preventDefault(); alert('Coming Soon! The iOS app is on its way. 🍎')">
-
+      <a href="#" class="dl-btn dl-btn-ios" onclick="event.preventDefault(); showComingSoon()">
         <div class="dl-btn-icon">🍎</div>
         <div>
           <div class="dl-btn-text-small">Download on the</div>
@@ -1625,6 +1626,28 @@ const safetyIo = new IntersectionObserver(entries => {
   }
 }, { threshold: 0.4 });
 if (safetyNum) safetyIo.observe(safetyNum);
+</script>
+
+<!-- Coming Soon Modal -->
+<div id="comingSoonModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:9000;align-items:center;justify-content:center;">
+  <div style="background:var(--paper);border-radius:24px;padding:48px 40px;max-width:380px;width:90%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,0.3);animation:fadeUp 0.35s ease both;">
+    <div style="font-size:52px;margin-bottom:16px">🍎</div>
+    <div style="font-family:var(--display);font-size:28px;font-weight:900;color:var(--ink);margin-bottom:10px">Coming Soon</div>
+    <div style="font-size:15px;color:var(--muted);line-height:1.7;font-weight:300;margin-bottom:32px">The Adiss Ride iOS app is on its way.<br/>Stay tuned for the App Store launch!</div>
+    <button onclick="document.getElementById('comingSoonModal').style.display='none'" style="background:var(--orange);color:white;border:none;border-radius:100px;padding:14px 36px;font-size:15px;font-weight:600;font-family:var(--body);cursor:pointer;box-shadow:0 8px 24px rgba(232,84,10,0.3);transition:background 0.2s;" onmouseover="this.style.background='#9e2e05'" onmouseout="this.style.background='var(--orange)'">Got it!</button>
+  </div>
+</div>
+
+
+<script>
+function showComingSoon() {
+  const modal = document.getElementById('comingSoonModal');
+  modal.style.display = 'flex';
+}
+document.getElementById('comingSoonModal').addEventListener('click', function(e) {
+  if (e.target === this) this.style.display = 'none';
+});
+</script>
 </script>
 
 </body>
